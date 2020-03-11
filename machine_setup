@@ -1,0 +1,125 @@
+# create user and add to the sudoers 
+sudo adduser chhan
+sudo usermod -aG sudo chhan
+
+password: ******
+
+# switch to chhan account
+su - chhan
+whoami ==> chhan
+sudo whoami ==> root
+
+# check groups
+groups
+
+# copy local id_rsa.pub to chhan/.ssh/authorized_keys
+# and login as chhan instead of ubuntu
+ssh chhan@ec2-35-156-106-168.eu-central-1.compute.amazonaws.com ==> chhan@ip-172-31-64-6:~
+
+# set .bashrc
+export EDITOR=/usr/bin/vim
+
+
+# install docker
+
+wget https://download.docker.com/linux/ubuntu/dists/bionic/pool/stable/amd64/containerd.io_1.2.13-1_amd64.deb -O ~/containerd.io.deb
+wget https://download.docker.com/linux/ubuntu/dists/bionic/pool/stable/amd64/docker-ce-cli_19.03.7~3-0~ubuntu-bionic_amd64.deb -O ~/docker-ce-cli.deb
+wget https://download.docker.com/linux/ubuntu/dists/bionic/pool/stable/amd64/docker-ce_19.03.7~3-0~ubuntu-bionic_amd64.deb -O ~/docker-ce.deb
+
+sudo dpkg -i ~/containerd.io.deb ~/docker-ce-cli.deb ~/docker-ce.deb
+rm ~/containerd.io.deb ~/docker-ce-cli.deb ~/docker-ce.deb
+
+# verify docker works
+sudo docker run hello-world
+sudo docker run -it ubuntu bash
+
+# Post-installation steps for Linux(avoid using sudo)
+# https://docs.docker.com/install/linux/linux-postinstall/
+
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+
+docker run hello-world
+
+# setting up ssh for git
+# https://help.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+# https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account
+
+# because github ssh key will sync from zack, and in zack, multiple ssh keys are not supported so use your local ssh key pair
+# ssh-keygen -t rsa -b 4096 -C "changli.han@zalan.do"
+scp -r .ssh/id_rsa* chhan@ec2-52-58-132-175.eu-central-1.compute.amazonaws.com:~/.ssh/
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+
+git config --global user.name "Changli Han"
+git config --global user.email changli.han@zalando.de
+# git commit --amend --reset-author
+
+
+
+# setup git in bash
+# https://git-scm.com/book/en/v2/Appendix-A%3A-Git-in-Other-Environments-Git-in-Bash
+wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
+## edit .bashrc in ubuntu
+
+# setup vim
+scp -r .vim chhan@ec2-52-58-132-175.eu-central-1.compute.amazonaws.com:~/
+# setup git in bash
+. ~/git-completion.bash
+. ~/git-prompt.sh
+export GIT_PS1_SHOWDIRTYSTATE=1
+
+if [ "$color_prompt" = yes ]; then
+    PROMPT_COMMAND=__prompt_command # Func to gen PS1 after CMDs
+    __prompt_command() {
+    local EXIT="$?"             # This needs to be first
+    PS1='${debian_chroot:+($debian_chroot)}'
+    if [ $EXIT != 0 ]; then
+        PS1+='\[\033[01;31m\]\u'      # Add red if exit code non 0
+    else
+        PS1+='\[\033[01;32m\]\u'
+    fi
+
+    PS1+='@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]$(__git_ps1 " (%s)")\$ '
+    }
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+
+# in order to git clone using https we need to create github personal access tokens
+# https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+
+# it's also helpful to cache your credentials for a long time
+# https://help.github.com/en/github/using-git/caching-your-github-password-in-git
+git config --global credential.helper cache
+git config --global credential.helper 'cache --timeout=3600'
+
+# github personal access tokens
+******************************
+hint: go to sticky note and find it out.
+
+
+
+
+# install miniconda
+# https://stackoverflow.com/questions/45686566/how-to-install-miniconda-on-ubuntu-automatically
+# https://conda.io/projects/conda/en/latest/user-guide/install/macos.html#install-macos-silent
+export CONDA_DIR=???
+wget --progress=bar:force:noscroll https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
+bash ~/miniconda.sh -f -b -p $HOME/miniconda
+rm ~/miniconda.sh
+
+# uninstall miniconda 
+rm -rf ~/miniconda
+
+
+# setup pierone
+
+
+# install nodejs
+
+# install python
+
+# install k8s
