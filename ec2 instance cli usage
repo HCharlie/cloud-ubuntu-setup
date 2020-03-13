@@ -1,0 +1,19 @@
+# start an EC2 instance
+zaws login data-test
+export instanceID=i-0b01f146f6986d0f7
+aws ec2 describe-instances --instance-ids $instanceID
+
+# start instance
+aws ec2 start-instances --instance-ids $instanceID
+
+# get instance public ip addr and login
+export ec2_host=$(aws ec2 describe-instances --instance-ids $instanceID --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+ssh chhan@$(ec2_host)
+
+# stop instance
+aws ec2 stop-instances --instance-ids $instanceID
+
+# list all running instance information table
+aws ec2 describe-instances \
+    --query 'Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Name:Tags[?Key==`Name`]|[0].Value,InstanceType:InstanceType}' \
+    --output table
