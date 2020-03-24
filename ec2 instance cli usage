@@ -1,6 +1,6 @@
 # start an EC2 instance
 zaws login data-test
-export instanceID=i-0b01f146f6986d0f7
+export instanceID=i-0b3a8d14b9a7ed8ed
 aws ec2 describe-instances --instance-ids $instanceID
 
 # start instance
