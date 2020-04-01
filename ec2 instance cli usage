@@ -8,7 +8,7 @@ aws ec2 start-instances --instance-ids $instanceID
 
 # get instance public ip addr and login
 export ec2_host=$(aws ec2 describe-instances --instance-ids $instanceID --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-ssh chhan@$(ec2_host)
+ssh chhan@${ec2_host}
 
 # stop instance
 aws ec2 stop-instances --instance-ids $instanceID
