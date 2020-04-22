@@ -1,0 +1,8 @@
+#!/bin/bash
+
+zaws login data-test
+
+export instanceID=i-09ddb2336ab694ea7
+
+echo "Stopping the Datalab build machine"
+aws ec2 stop-instances --instance-ids $instanceID

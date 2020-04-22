@@ -1,0 +1,17 @@
+#!/bin/bash
+echo "zaws login data-test"
+zaws login data-test
+
+export instanceID=i-09ddb2336ab694ea7
+
+echo "Start the Datalab build machine"
+aws ec2 start-instances --instance-ids $instanceID
+
+sleep 5
+export ec2_host=$(aws ec2 describe-instances --instance-ids $instanceID --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+
+
+echo "Copy and run below command to connect to ec2 instance"
+echo "ssh chhan@${ec2_host}" 
+echo "or"
+echo "ssh chhan@\`describe_ec2_ip_addr\`"

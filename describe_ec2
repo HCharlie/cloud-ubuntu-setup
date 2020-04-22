@@ -1,0 +1,9 @@
+#!/bin/bash
+
+zaws login data-test
+
+export instanceID=i-09ddb2336ab694ea7
+
+echo "Describe ec2 instance: instanceID: ${instanceID}"
+aws ec2 describe-instances --instance-ids $instanceID \
+    --query 'Reservations[*].Instances[*].State'
